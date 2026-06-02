@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>new_Blogs</title>
+</head>
+<body class="bg-dark">
+    <div class="main-div d-flex flex-cloumn flex-lg-row">
+        <form class="form bg-light shadow p-4  m-3  rounded" id="form">
+            <label for="title" class="form-label">title:</label>
+            <input type="text" name="title" id="title" class="title form-control" required>
+            <label for="author">author:</label>
+            <input type="text" name="author" id="author" class="author form-control " required>
+            <label for="blog">description:</label>
+            <textarea name="blog" id="blog" class="blog overflow-y-auto form-control p-2" style="max-height:200px;" required></textarea>
+            <div class="submit">
+                <button type="submit" id="submit" class="submit border-0 m-2 p-3 bg-primary rounded w-100 fw-bolder text-white">Submit</button>
+            </div>
+        </form>
+        <aside class="result-section ">
+            <ul class="blog-lists"></ul>
+        </aside>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
