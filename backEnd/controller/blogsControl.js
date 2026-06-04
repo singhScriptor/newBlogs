@@ -13,7 +13,7 @@ const postBlog = async(req,res)=>{
 
 const getBlog = async(req,res)=>{
     try{
-        const result = await postBlog.findhAll()
+        const result = await blogs.findAll()
         res.json(result)
 
     }

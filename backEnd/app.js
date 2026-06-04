@@ -5,9 +5,18 @@ const port= 3000
 
 const app = express()
 
+app.use(express.json())
+app.use(cors())
+
+const blogRoutes = require('./routes/blogRouter')
+const commentRoutes = require('./routes/commentRouter')
+
 app.get('/',(req,res)=>{
     res.send('server is working!')
 })
+
+app.use("/blogs",blogRoutes)
+app.use("/blogs/:blogId/comments",commentRoutes)
 
 
 

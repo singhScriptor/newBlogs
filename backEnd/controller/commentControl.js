@@ -14,7 +14,8 @@ const postComment = async(req,res)=>{
 
 const getcomment = async(req,res)=>{
     try{
-        const result = await comments.findAll()
+        const { blogId } = req.params
+        const result = await comments.findAll({where:{blogId}})
         res.json(result)
     }
     catch(err){
