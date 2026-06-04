@@ -1,0 +1,6 @@
+.blog-lists {
+  width: 100%;       /* force ul to take full width */
+}
+.list {
+  display: block;    /* li spans full width */
+}

@@ -1,120 +1,77 @@
+
 document.addEventListener('DOMContentLoaded',reload)
-const form = document.getElementById('form')
+const form  = document.getElementById('form')
 
-let blogList = document.getElementById('blog-lists')
+const blogList = document.getElementById('blog-lists')
 
-form.addEventListener('submit', addBlogs)
+form.addEventListener('submit',addBlogs);
 
-async function addBlogs(e) {
+async function addBlogs(e){
     e.preventDefault()
-    try {
+    try{
         const blogs = {
-            title: document.getElementById('title').value,
-            author: document.getElementById('author').value,
-            blog: document.getElementById('blog').value
+            title:document.getElementById('title').value ,
+            author:document.getElementById('author').value,
+            blog:document.getElementById('blog').value
         }
-        if (blogs) {
-            let result = await axios.post('http://localhost:3000/blogs', blogs)
-            blogs.id = result.data.id
-            console.log(result.data)
-            let details = result.data
-            await displayBlogs(details)
-        }
+        let result = await axios.post('http://localhost:3000/blogs',blogs)
+        let id = result.data.id
+        console.log(result.data)
+        const details = result.data
 
+        await displayDetails(details)
     }
-    catch (err) {
+    catch(err){
         console.log(err.message)
     }
     form.reset()
 }
 
-async function displayBlogs(details) {
-    try {
+async function displayDetails(details) {
+    try{
         let list = document.createElement('li')
-        list.className = 'list d-flex justify-content-between align-items-center'
+        list.className = 'list p-2 m-1 rounded border-0 shadow w-100 d-block'
 
-        const titleSpan = document.createElement('span')
-        titleSpan.textContent = details.title
+        let div = document.createElement('div')
+        div.className = 'd-flex align-items-center w-100'
 
-        const toggleBtn = document.createElement('button')
-        toggleBtn.className = 'btn btn-sm text-danger border-0 ms-auto fw-bolder'
-        toggleBtn.textContent = "+"
+        let span = document.createElement('span')
+        span.textContent = details.title
 
-        list.appendChild(titleSpan)
-        list.appendChild(toggleBtn)
+        let toggleBtn = document.createElement('button')
+        toggleBtn.className = 'ms-auto text-danger fw-bolder border-0 bg-dark text-danger'
+        toggleBtn.textContent = '+'
 
-        blogList.appendChild(list)
+        div.appendChild(span)
+        div.appendChild(toggleBtn)
 
-        toggleBtn.addEventListener('click', () => {
-            let data = list.querySelector('.details')
-            if (data) {
-                data.remove()
-                toggleBtn.textContent = '+'
-                return
+        list.appendChild(div)
+
+
+        let detailsDiv = document.createElement('div')
+        detailsDiv.className = 'd-none mt-2'
+        detailsDiv.innerHTML = `
+
+        <strong> Author: </strong> ${details.author} <br>
+        <strong> Blog: </strong> ${details.blog} <br>
+        <input type="text" class="comment m-1 form-control w-50" id="comment">
+        <button type="button" class="cmnt-btn bg-primary rounded text-white" id="cmnt-btn">comment</button>
+        `
+        list.appendChild(detailsDiv)
+
+         blogList.appendChild(list)
+
+        toggleBtn.addEventListener('click',()=>{
+            if(detailsDiv.classList.contains('d-none')){
+                detailsDiv.classList.remove('d-none')
+                toggleBtn.textContent ='-'
             }
-            const div = document.createElement('div')
-            div.className = 'details p-2 rounded w-100'
-
-            div.innerHTML = `
-                <p><strong>Author:</strong> ${details.author}</p><br>
-                <p><strong>Description:</strong> ${details.blog}</p><br><br>
-                <h2>comments:</h2><br>
-                <input type="text" id="comment-${details.id}" class="comment form-control w-50"><br>
-                <button type="submit" class="comment-btn bg-info rounded p-2" id="comment-btn-${details.id}">Submit</submit>
-
-            `
-            list.appendChild(div)
-            toggleBtn.textContent = "-"
-
-            let commentBtn = document.getElementById(`comment-btn-${details.id}`)
-            commentBtn.addEventListener('click', async () => {
-                let commentDetails = {
-                    comment: document.getElementById(`comment-${details.id}`).value
-                }
-                if (commentDetails.comment) {
-                    try {
-                        let res = await axios.post('http://localhost:3000/comments', {
-                            comment : commentDetails.comment,
-                            blogId : details.id
-                        })
-                        let commentId = res.data.id
-                        console.log(res.data)
-                        const p = document.createElement('p')
-                        p.textContent = res.data.comment
-
-                        let cmntDlt = document.createElement('button')
-                        cmntDlt.className='del-cmnt p-2 border-0 bg-warning rounded text-white'
-                        cmntDlt.textContent = 'delete'
-
-
-                        p.appendChild(cmntDlt)
-
-                        div.appendChild(p)
-
-                        cmntDlt.addEventListener('click',async()=>{
-                            await deleteComment(p,commentId)
-
-                        })
-
-                    }
-                    catch(err){
-                        console.log(err.message)
-                    }
-                }
-            })
-
+            else{
+                detailsDiv.classList.add('d-none')
+                toggleBtn.textContent = '+'
+            }
         })
 
-    }
-    catch(err){
-        console.log(err.message)
-    }
-}
-
-async function deleteComment(p,commentId){
-    try{
-        await axios.delete(`http://localhost:3000/comments/${commentId}`)
-        p.remove()
     }
     catch(err){
         console.log(err.message)
@@ -122,14 +79,12 @@ async function deleteComment(p,commentId){
 }
 
 async function reload() {
-    try {
-        const blogsRes = await axios.get('http://localhost:3000/blogs')
-        const commentsRes = await axios.get('http://localhost:3000/comments')
-
-        blogsRes.data.forEach(blog => {
-            displayBlogs(blog)
-        })
-
+    try{
+        let result = await axios.get('http://localhost:3000/blogs')
+        let ans=result.data
+        ans.forEach(i => {
+            displayDetails(i)
+        });
     }
     catch(err){
         console.log(err.message)
