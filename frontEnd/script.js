@@ -15,7 +15,7 @@ async function addBlogs(e){
             blog:document.getElementById('blog').value
         }
         let result = await axios.post('http://localhost:3000/blogs',blogs)
-        let id = result.data.id
+        //let id = result.data.id
         console.log(result.data)
         const details = result.data
 
@@ -54,8 +54,9 @@ async function displayDetails(details) {
 
         <strong> Author: </strong> ${details.author} <br>
         <strong> Blog: </strong> ${details.blog} <br>
-        <input type="text" class="comment m-1 form-control w-50" id="comment">
-        <button type="button" class="cmnt-btn bg-primary rounded text-white" id="cmnt-btn">comment</button>
+        <input type="text" class="comment m-1 form-control w-50" id="comment-${details.id}">
+        <button type="button" class="cmnt-btn bg-warning rounded text-white" id="cmnt-btn-${details.id}">comment</button>
+        <ul id="comments-${details.id}" class="mt-2"></ul>
         `
         list.appendChild(detailsDiv)
 
@@ -72,19 +73,82 @@ async function displayDetails(details) {
             }
         })
 
+        let c_btn = detailsDiv.querySelector(`#cmnt-btn-${details.id}`)
+        c_btn.addEventListener('click',async()=>{
+            await addComments(details.id)
+        })
     }
     catch(err){
         console.log(err.message)
     }
 }
 
+async function addComments(blogId) {
+    try {
+        let c_input = document.getElementById(`comment-${blogId}`).value
+        let result = await axios.post(`http://localhost:3000/blogs/${blogId}/comments`, { comment: c_input })
+        const comment = result.data
+
+        await displayComment(blogId,comment)
+
+
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+async function displayComment(blogId,comment) {
+    try{
+        let c_list = document.createElement('li')
+        c_list.className ='c-list border-0 form-control bg-dark text-white d-flex'
+        c_list.textContent =comment.comment
+
+        let c_del = document.createElement('button')
+        c_del.className='c-del rounded  bg-danger text-white  border-0 ms-auto'
+        c_del.textContent = 'delete'
+
+        c_list.appendChild(c_del)
+
+        let userList = document.getElementById(`comments-${blogId}`)
+
+        userList.appendChild(c_list)
+
+        c_del.addEventListener('click',async()=>{
+            await deleteComment(blogId,comment.id,c_list)
+        })
+
+    }
+    catch(err){
+        console.log(err.message)
+    }
+}
+
+async function deleteComment(blogId,commentId,c_list) {
+    try{
+        await axios.delete(`http://localhost:3000/blogs/${blogId}/comments/${commentId}`)
+        c_list.remove()
+    }
+    catch(err){
+        console.log(err.message)
+    }
+}
+
+
 async function reload() {
     try{
         let result = await axios.get('http://localhost:3000/blogs')
         let ans=result.data
-        ans.forEach(i => {
-            displayDetails(i)
-        });
+        for(let i of ans) {
+           await  displayDetails(i)
+
+           let comments = await axios.get(`http://localhost:3000/blogs/${i.id}/comments`)
+           let c_mnt = comments.data
+           c_mnt.forEach(j=>{
+            displayComment(i.id,j)
+           })
+
+        };
+
     }
     catch(err){
         console.log(err.message)
